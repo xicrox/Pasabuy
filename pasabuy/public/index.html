@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pasabuy</title>
+<meta name="theme-color" content="#16213a"><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#16213a;--sun:#ffc533;--paper:#faf8f2;--mut:#69718a;--line:#e5e1d5;--ok:#1f8a5b;--bad:#d64531}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.4 'Bricolage Grotesque',system-ui,sans-serif;background:#0d1426;color:var(--ink)}
+#app{max-width:430px;height:100dvh;margin:auto;background:var(--paper);display:flex;flex-direction:column}
+header{background:var(--ink);color:#fff;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.logo{font-weight:800;font-size:22px;letter-spacing:-.5px}.logo b{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--sun);margin-left:2px}
+select,input,textarea{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+header select{width:auto;max-width:150px;font-size:12px;background:#243055;color:#fff;border:0}
+main{flex:1;overflow:auto;padding:14px}
+nav{display:flex;border-top:1px solid var(--line);background:#fff}
+nav a{flex:1;text-align:center;padding:11px 0;font-size:12px;color:var(--mut);position:relative;cursor:pointer}
+nav a.on{color:var(--ink);font-weight:600;box-shadow:inset 0 3px var(--sun)}
+.bd{position:absolute;top:4px;margin-left:6px;background:var(--bad);color:#fff;border-radius:9px;font-style:normal;font-size:10px;padding:0 5px}
+h1{font-size:24px;line-height:1.15;font-weight:800;letter-spacing:-.5px;margin-bottom:6px}
+h3{margin:18px 0 8px;font-size:16px}.mut{color:var(--mut);font-size:13px}
+label{display:block;font-size:13px;color:var(--mut);margin-bottom:10px}label input,label select,label textarea{margin-top:4px}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.btn{background:var(--ink);color:#fff;border:0;border-radius:9px;padding:10px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.big{width:100%;margin:12px 0;padding:13px;background:var(--sun);color:var(--ink)}
+.btn.ghost{background:none;color:var(--ink);border:1px solid var(--line)}.btn.bad{background:var(--bad)}
+.btn:disabled{opacity:.4;cursor:not-allowed}.btn.sm{padding:6px 10px;font-size:13px}
+.box,.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0}
+.card{cursor:pointer}.top{display:flex;justify-content:space-between;gap:8px;margin-bottom:4px}
+.meta{display:flex;gap:12px;font-size:13px;margin-top:8px;font-weight:600}
+.chip{font-size:11px;padding:2px 8px;border-radius:10px;background:#eee;white-space:nowrap;height:fit-content}
+.chip.open,.chip.pending{background:#fff1c7}.chip.accepted,.chip.buying,.chip.onway{background:#d9e6ff}
+.chip.delivered,.chip.verified{background:#d5f0e3}.chip.cancelled,.chip.expired,.chip.banned,.chip.rejected,.chip.suspended{background:#f9dcd7}
+.note{background:#fff1c7;border-radius:10px;padding:10px;margin-bottom:12px;font-size:13px}
+.empty{color:var(--mut);text-align:center;padding:24px 10px}
+.trk{display:flex;margin:16px 0 8px}
+.stp{flex:1;text-align:center;font-size:11px;color:var(--mut);position:relative}
+.stp i{display:block;width:14px;height:14px;border-radius:50%;background:var(--line);margin:0 auto 6px;position:relative;z-index:1}
+.stp:not(:first-child)::before{content:'';position:absolute;top:5px;left:-50%;width:100%;height:4px;background:var(--line)}
+.stp.on i,.stp.on::before{background:var(--ink)}.stp.on{color:var(--ink)}
+.stp.cur i{background:var(--sun);box-shadow:0 0 0 4px rgba(255,197,51,.4);animation:p 1.6s infinite}
+@keyframes p{50%{box-shadow:0 0 0 9px rgba(255,197,51,0)}}
+@media(prefers-reduced-motion:reduce){.stp.cur i{animation:none}}
+.chat{max-height:220px;overflow:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.bub{max-width:80%;padding:7px 10px;border-radius:12px;background:#eceae1;font-size:14px}
+.bub.me{align-self:flex-end;background:var(--sun)}.bub small{display:block;color:var(--mut);font-size:10px}
+.star{background:none;border:0;font-size:28px;color:var(--line);cursor:pointer}.star.on{color:var(--sun)}
+.acts{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}
+a{color:var(--ink);font-weight:600;cursor:pointer;text-decoration:underline}
+.auth{padding:28px 18px;overflow:auto}.auth .logo{font-size:30px;margin-bottom:14px}
+#toast{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:9px 14px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90%}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+</style></head><body>
+<div id="app"></div><div id="toast" role="status"></div>
+<script>
+const SPOTS=['Main Gate','Library','Engineering Bldg','Canteen','Gym','Dorm A','Dorm B','Admin Bldg'];
+const ST=['open','accepted','buying','onway','delivered'],STEP=['Posted','Accepted','Buying','On the way','Delivered'];
+const LBL={open:'Waiting for a runner',accepted:'Runner accepted',buying:'Buying items',onway:'On the way',delivered:'Delivered',cancelled:'Cancelled',expired:'Expired',pending:'Awaiting verification',verified:'Verified',suspended:'Suspended',banned:'Banned',rejected:'Rejected'};
+const $=s=>document.querySelector(s),U=id=>S.users.find(u=>u.id==id),rq=id=>S.reqs.find(r=>r.id==id);
+let S={me:null,users:[],reqs:[],msgs:[],notifs:[],reports:[],reviews:[]},V={tab:'home',stars:5},T=localStorage.getItem('pb_t'),ES,seen=-1;
+async function api(p,b){try{const r=await fetch('/api/index?p='+p,{method:b?'POST':'GET',headers:{'Content-Type':'application/json',Authorization:'Bearer '+(T||'')},body:b?JSON.stringify(b):undefined});const j=await r.json().catch(()=>({}));if(!r.ok){if(r.status==401&&T)drop();else toast(j.error||'Something went wrong.');return null}return j}catch(e){toast("You're offline. Reconnect and try again.");return null}}
+function drop(){T=null;localStorage.removeItem('pb_t');clearInterval(ES);S.me=null;R()}
+async function sync(){if(!T)return R();const j=await api('state');if(!j)return;S=j;const n=S.notifs.filter(x=>!x.read);
+if(seen>=0&&n.length>seen&&document.hidden&&'Notification' in window&&Notification.permission=='granted')navigator.serviceWorker.ready.then(g=>g.showNotification('Pasabuy',{body:n[0].text,icon:'/icon-192.png'}));seen=n.length;R()}
+function live(){clearInterval(ES);if(!T)return;ES=setInterval(()=>{if(!document.hidden)sync()},8000)}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&T)sync()});
+async function act(n,...a){const j=await api('act',{n,a});if(j)await sync();return j}
+function st(r){return r.status=='open'&&r.due<Date.now()?'expired':r.status}
+function avg(id){const a=S.reviews.filter(v=>v.to==id);return a.length?'★ '+(a.reduce((s,v)=>s+v.stars,0)/a.length).toFixed(1):'New'}
+function left(t){const m=Math.round((t-Date.now())/6e4);return m<0?'past due':m<60?m+' min left':Math.floor(m/60)+'h '+m%60+'m left'}
+function tm(t){return new Date(t).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})}
+function N(to,text){S.notifs.unshift({to,text,t:Date.now(),read:0})}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function toast(m){const t=$('#toast');t.textContent=m;t.style.opacity=1;clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.opacity=0,2400)}
+/* actions */
+async function enter(path,b){const j=await api(path,b);if(!j)return;T=j.token;localStorage.setItem('pb_t',T);seen=-1;await sync();V={tab:U(S.me)&&U(S.me).role=='admin'?'a1':'home',stars:5};R();live();if('Notification' in window&&Notification.permission=='default')Notification.requestPermission()}
+function login(){enter('login',{sid:$('#a1').value.trim(),pw:$('#a2').value})}
+function reg(){enter('signup',{name:$('#a0').value.trim(),sid:$('#a1').value.trim(),pw:$('#a2').value})}
+function out(){api('logout',{});drop()}
+function go(t){V.tab=t;V.oid=null;V.rep=0;if(t=='alerts')act('read');else R()}
+function open_(id){V.oid=id;V.tab='order';R()}
+async function post(){const g=i=>$('#f'+i).value.trim();if(await act('post',{title:g(1),store:g(2),note:g(3),drop:g(4),mins:+g(5),budget:+g(6),fee:+g(7)})){V.form=0;R();toast('Request posted.')}}
+async function acc(id){if(await act('acc',id))open_(id)}
+async function back(id){if(await act('back',id))go('orders')}
+const dec=id=>act('dec',id),adv=id=>act('adv',id),cancel=id=>act('cancel',id),setU=(id,s)=>act('setU',id,s),res=(id,a)=>act('res',id,a);
+async function send(id){const i=$('#cm'),v=i.value.trim();if(!v)return;i.value='';await act('send',id,v)}
+function setStars(n){V.stars=n;document.querySelectorAll('.star').forEach((b,i)=>b.classList.toggle('on',i<n))}
+async function rate(id){if(await act('rate',id,V.stars,$('#rv').value.trim())){V.stars=5;R();toast('Thanks for the review.')}}
+async function report(id){if(await act('report',id,$('#rp1').value,$('#rp2').value.trim())){V.rep=0;R();toast('Report sent to the admins.')}}
+/* views */
+function track(r){const i=ST.indexOf(st(r));return`<div class=trk>${STEP.map((n,k)=>`<div class="stp ${k<=i?'on':''} ${k==i&&i<4?'cur':''}"><i></i>${n}</div>`).join('')}</div>`}
+function card(r,tag){const s=st(r);return`<div class=card onclick="open_(${r.id})"><div class=top><b>${esc(r.title)}</b><span class="chip ${s}">${LBL[s]}</span></div><div class=mut>${esc(r.store)} to ${esc(r.drop)}${tag?' · '+tag:''}</div><div class=meta><span>₱${r.fee} fee</span><span>₱${r.budget} items</span><span>${s=='open'?left(r.due):'Due '+tm(r.due)}</span></div></div>`}
+function auth(){return`<div class=auth><div class=logo>pasabuy<b></b></div><h1>Campus errands, run by fellow students.</h1><p class=mut style="margin-bottom:14px">${V.reg?'Sign up with your student ID. An admin verifies you before you can post or run errands.':'Log in with your student ID.'}</p><div class=box>${V.reg?'<label>Full name<input id=a0 autocomplete=name></label>':''}<label>Student ID<input id=a1 autocomplete=username></label><label>Password<input id=a2 type=password autocomplete="${V.reg?'new-password':'current-password'}" onkeydown="if(event.key=='Enter')${V.reg?'reg()':'login()'}"></label><button class="btn big" onclick="${V.reg?'reg()':'login()'}">${V.reg?'Create account':'Log in'}</button><p class=mut>${V.reg?'Have an account? <a onclick="V.reg=0;R()">Log in</a>':'New here? <a onclick="V.reg=1;R()">Create an account</a>'}</p></div></div>`}
+function head(u){return`<header><div class=logo>pasabuy<b></b></div><span style="font-size:13px;opacity:.7">${esc(u.name)}</span></header>`}
+function form(){return`<div class=box><label>What do you need?<input id=f1 placeholder="e.g. Siomai rice, 2 orders"></label><label>Buy from<input id=f2 placeholder="Canteen, 7-Eleven, bookstore"></label><label>Details<textarea id=f3 rows=2 placeholder="Brand, size, allergies"></textarea></label><div class=row><label>Drop-off<select id=f4>${SPOTS.map(s=>`<option>${s}</option>`).join('')}</select></label><label>Deadline<select id=f5><option value=15>15 min</option><option value=30 selected>30 min</option><option value=60>1 hour</option><option value=120>2 hours</option></select></label></div><div class=row><label>Item budget (₱)<input id=f6 type=number min=0 value=100></label><label>Runner fee (₱)<input id=f7 type=number min=10 value=20></label></div><div class=acts><button class=btn onclick="post()">Post request</button><button class="btn ghost" onclick="V.form=0;R()">Cancel</button></div></div>`}
+function home(u){const ok=u.status=='verified',mine=S.reqs.filter(r=>r.by==u.id).sort((a,b)=>b.t-a.t);
+return(ok?'':'<div class=note>Your account is waiting for verification. An admin checks your student ID first. You can browse, but you can\'t post or run errands yet.</div>')+`<h1>Need something from around campus?</h1><p class=mut>Post an errand. A verified student nearby picks it up for a fee you set.</p>`+(V.form?form():`<button class="btn big" ${ok?'':'disabled'} onclick="V.form=1;R()">Post a request</button>`)+`<h3>My requests</h3>`+(mine.length?mine.map(r=>card(r)).join(''):'<p class=empty>No requests yet. Post one and runners will see it right away.</p>')}
+function board(u){const l=S.reqs.filter(r=>st(r)=='open'&&r.by!=u.id&&!r.dec.includes(u.id)).sort((a,b)=>a.due-b.due);
+return`<h1>Errands near you</h1><p class=mut>Accept one to start earning the runner fee.</p>`+(l.length?l.map(r=>`<div class=box><div class=top><b>${esc(r.title)}</b><span class=mut>${esc(U(r.by).name)} · ${avg(r.by)}</span></div><div class=mut>${esc(r.store)} to ${esc(r.drop)}</div>${r.note?`<div style="margin-top:6px;font-size:14px">${esc(r.note)}</div>`:''}<div class=meta><span>₱${r.fee} fee</span><span>₱${r.budget} items</span><span>${left(r.due)}</span></div><div class=acts><button class="btn sm" onclick="acc(${r.id})">Accept</button><button class="btn ghost sm" onclick="dec(${r.id})">Decline</button></div></div>`).join(''):'<p class=empty>No open errands right now. Check back soon.</p>')}
+function orders(u){const l=S.reqs.filter(r=>r.by==u.id||r.runner==u.id).sort((a,b)=>b.t-a.t);return`<h1>My orders</h1>`+(l.length?l.map(r=>card(r,r.by==u.id?'You requested':'You\'re running')).join(''):'<p class=empty>Nothing yet. Accepted and posted errands show up here.</p>')}
+function order(u){const r=rq(V.oid),s=st(r),rb=U(r.by),rn=r.runner&&U(r.runner),isR=u.id==r.by,isN=u.id==r.runner,o=isR?rn:rb;let a='';
+if(isR&&s=='open')a=`<button class="btn ghost" onclick="cancel(${r.id})">Cancel request</button>`;
+if(isN&&s=='accepted')a=`<button class=btn onclick="adv(${r.id})">Start buying</button><button class="btn ghost" onclick="back(${r.id})">Back out</button>`;
+if(isN&&s=='buying')a=`<button class=btn onclick="adv(${r.id})">I'm on my way</button>`;
+if(isN&&s=='onway')a=`<button class=btn onclick="adv(${r.id})">Mark delivered</button>`;
+const done=s=='delivered'&&o&&!S.reviews.some(v=>v.rid==r.id&&v.from==u.id),m=S.msgs.filter(x=>x.rid==r.id);
+return`<a onclick="go('${isR?'home':'orders'}')">Back</a><div class=top style="margin-top:10px"><h1>${esc(r.title)}</h1><span class="chip ${s}">${LBL[s]}</span></div>${track(r)}
+<div class=box><div class=mut>Buy from</div>${esc(r.store)}<div class=mut style="margin-top:6px">Drop-off</div>${esc(r.drop)}${r.note?`<div class=mut style="margin-top:6px">Details</div>${esc(r.note)}`:''}<div class=meta><span>₱${r.fee} fee</span><span>₱${r.budget} items</span><span>${s=='open'?left(r.due):'Due '+tm(r.due)}</span></div></div>
+<div class=mut>Requester: ${esc(rb.name)} (${avg(rb.id)})${rn?` · Runner: ${esc(rn.name)} (${avg(rn.id)})`:''}</div>${a?`<div class=acts>${a}</div>`:''}
+${done?`<div class=box><b>Rate ${esc(o.name)}</b><div>${[1,2,3,4,5].map(n=>`<button class="star ${n<=V.stars?'on':''}" aria-label="${n} stars" onclick="setStars(${n})">★</button>`).join('')}</div><label>Review (optional)<input id=rv placeholder="How did it go?"></label><button class=btn onclick="rate(${r.id})">Submit review</button></div>`:''}
+${rn&&(isR||isN)?`<h3>Chat with ${esc(o.name)}</h3><div class=chat>${m.length?m.map(x=>`<div class="bub ${x.from==u.id?'me':''}">${esc(x.text)}<small>${tm(x.t)}</small></div>`).join(''):'<p class=mut>Say hi and confirm the details.</p>'}</div><div class=row><input id=cm placeholder="Message" onkeydown="if(event.key=='Enter')send(${r.id})"><button class="btn" style="flex:0" onclick="send(${r.id})">Send</button></div>`:''}
+${o&&(isR||isN)?(V.rep?`<div class=box><b>Report ${esc(o.name)}</b><label>Reason<select id=rp1><option>No-show</option><option>Wrong or missing item</option><option>Rude behavior</option><option>Fake request</option><option>Overcharging</option></select></label><label>What happened?<textarea id=rp2 rows=2></textarea></label><div class=acts><button class="btn bad" onclick="report(${r.id})">Send report</button><button class="btn ghost" onclick="V.rep=0;R()">Cancel</button></div></div>`:`<p style="margin-top:16px"><a onclick="V.rep=1;R()">Report a problem</a></p>`):''}`}
+function alerts(u){const l=S.notifs.filter(n=>n.to==u.id);return`<h1>Notifications</h1>`+(l.length?l.map(n=>`<div class=box style="${n.read?'':'border-left:4px solid var(--sun)'}">${esc(n.text)}<div class=mut>${tm(n.t)}</div></div>`).join(''):'<p class=empty>You\'re all caught up.</p>')}
+function me(u){const rv=S.reviews.filter(v=>v.to==u.id);return`<h1>${esc(u.name)}</h1><p class=mut>Student ID ${esc(u.sid)} <span class="chip ${u.status}">${LBL[u.status]}</span></p><div class=box><b>${avg(u.id)}</b> from ${rv.length} review${rv.length==1?'':'s'}</div>${rv.map(v=>`<div class=box><span style="color:#d9a100">${'★'.repeat(v.stars)}</span> ${esc(U(v.from).name)}<div>${esc(v.text)}</div></div>`).join('')}<button class="btn ghost" onclick="out()">Log out</button>`}
+function a1(){const l=S.users.filter(u=>u.status=='pending');return`<h1>Verification queue</h1><p class=mut>Check each student ID before approving.</p>`+(l.length?l.map(u=>`<div class=box><b>${esc(u.name)}</b><div class=mut>Student ID ${esc(u.sid)} · ID photo submitted</div><div class=acts><button class="btn sm" onclick="setU('${u.id}','verified')">Verify</button><button class="btn ghost sm" onclick="setU('${u.id}','rejected')">Reject</button></div></div>`).join(''):'<p class=empty>No one is waiting for verification.</p>')}
+function a2(){const l=S.reports.filter(p=>p.open);return`<h1>Reports</h1>`+(l.length?l.map(p=>`<div class=box><b>${esc(U(p.against).name)}</b> <span class=mut>reported by ${esc(U(p.by).name)}</span><div>${esc(p.why)}</div>${p.note?`<div class=mut>${esc(p.note)}</div>`:''}<div class=mut>Order: ${esc(rq(p.rid)?rq(p.rid).title:'')}</div><div class=acts><button class="btn ghost sm" onclick="res(${p.id},0)">Dismiss</button><button class="btn sm" onclick="res(${p.id},'suspended')">Suspend</button><button class="btn bad sm" onclick="res(${p.id},'banned')">Ban</button></div></div>`).join(''):'<p class=empty>No open reports.</p>')}
+function a3(){return`<h1>All users</h1>`+S.users.filter(u=>u.role!='admin').map(u=>`<div class=box><div class=top><b>${esc(u.name)}</b><span class="chip ${u.status}">${LBL[u.status]}</span></div><div class=mut>${esc(u.sid)} · ${avg(u.id)}</div><div class=acts>${u.status=='verified'?`<button class="btn ghost sm" onclick="setU('${u.id}','suspended')">Suspend</button><button class="btn bad sm" onclick="setU('${u.id}','banned')">Ban</button>`:`<button class="btn sm" onclick="setU('${u.id}','verified')">${u.status=='pending'?'Verify':'Reinstate'}</button>`}</div></div>`).join('')}
+function tabs(u){const t=u.role=='admin'?[['a1','Verify'],['a2','Reports'],['a3','Users'],['alerts','Alerts']]:[['home','Home'],['board','Errands'],['orders','Orders'],['alerts','Alerts'],['me','Me']];const c=S.notifs.filter(n=>n.to==u.id&&!n.read).length;
+return`<nav>${t.map(([k,l])=>`<a class="${V.tab==k||(V.tab=='order'&&k=='orders')?'on':''}" onclick="go('${k}')">${l}${k=='alerts'&&c?`<i class=bd>${c}</i>`:''}</a>`).join('')}</nav>`}
+function R0(){const u=U(S.me);let h;
+if(!u)h=auth();
+else if(['suspended','banned','rejected'].includes(u.status))h=head(u)+`<main><h1>Your account is ${u.status}</h1><p class=mut>You can't post or run errands. Contact the campus admin office if you think this is a mistake.</p><br><button class="btn ghost" onclick="out()">Log out</button></main>`;
+else{const v={home,board,orders,order,alerts,me,a1,a2,a3}[V.tab]||home;h=head(u)+`<main>${v(u)}</main>`+tabs(u)}
+$('#app').innerHTML=h}
+function R(){const a=document.activeElement,id=a&&a.id,v={};document.querySelectorAll('#app [id]').forEach(e=>{if('value' in e)v[e.id]=e.value});R0();for(const k in v){const e=document.getElementById(k);if(e)e.value=v[k]}if(id){const e=document.getElementById(id);if(e)e.focus()}const c=$('.chat');if(c)c.scrollTop=c.scrollHeight}
+if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js');
+R();if(T){sync();live()}
+</script></body></html>
